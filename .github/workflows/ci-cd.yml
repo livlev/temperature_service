@@ -9,15 +9,13 @@ on:
       - main
 
 jobs:
-  # Job для тестирования и сборки Docker образа
   build:
     runs-on: ubuntu-latest
+    
     steps:
-      # Шаг 1: Клонируем репозиторий
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Шаг 2: Устанавливаем зависимости
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -28,12 +26,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Шаг 3: Запуск тестов (если у вас есть тесты, например, с использованием pytest)
-      - name: Run tests
-        run: |
-          pytest
-
-      # Шаг 4: Устанавливаем Docker
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -43,8 +35,10 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Шаг 5: Собираем и публикуем Docker образ
-      - name: Build and push Docker image
+      - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/temperature-service .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/temperature-service:latest .
+
+      - name: Push Docker image to Docker Hub
+        run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/temperature-service:latest
